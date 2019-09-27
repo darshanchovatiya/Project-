@@ -1,0 +1,104 @@
+{% extends 'basic.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block body %}
+<style>
+    .col-sm-3 img{
+      display: block;
+      max-width: 100%;
+      width :300;
+      height: 250;
+    }
+</style>
+
+<div class="conatiner-fluide" style="margin-top: 160px; align-content: center">
+  <div class="row text-center">    
+    {% for i in ist %}
+      <div class="col-sm-3">        
+        <div class="thumbnail">
+            <div class="panel-body">
+                {% if messages %}
+                  {% for  message in messages %}
+                    <div class="alert alert-{{message.tags}}">
+                      {{message}}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+            </div>            
+          <img src="/media/{{i.image}}" alt="{{i.prod_name}}" width="300" height="250">
+          <p><strong>{{i.p_name}}</strong></p>
+          <p><b>Price:{{i.price}}</b></p>
+          {% if i.rating >= 4.5  %}
+            <p style="color: red">Rating:{{i.rating}}<i class="fas fa-star" aria-hidden="true"></i></p> 
+          {% elif i.rating < 4.5 and i.rating >= 3 %}
+            <p style="color: rgb(247, 114, 6)">Rating:{{i.rating}}<i class="fas fa-star" aria-hidden="true"></i></p> 
+          {% elif i.rating < 3 %}
+            <p style="color: rgb(121, 118, 118)">Rating:{{i.rating}}<i class="fas fa-star" aria-hidden="true"></i></p> 
+          {% endif %} 
+          {% if i.stock <= 5 %}  
+            <p style="color: red"><strong>Hurry Only In Stock:{{i.stock}}</strong></p>
+          {% elif i.stock == 0 %}
+            <p style="color: red"><strong>Product Out Of Stock</strong></p>
+          {% else %}
+            <p><strong>In Stock:{{i.stock}}</strong></p>
+          {% endif %}              
+          <p><strong>Discreptions:</strong>{{i.desc}}</p>           
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}                                          
+            {{form|crispy}} 
+            {% if request.session.dis == 1 %}           
+              <button type="submit" id="submit" width="30" disabled="true" class="btn btn-warning" >Add To Cart</button>                            
+            {% elif i.stock == 0 %}
+              <p style="color: red"><strong>Please Try again latter</strong></p>
+            {% else %}
+             <button type="submit" id="submit" width="30" class="btn btn-warning" >Add To Cart</button>                            
+            {% endif %}
+          </form> 
+        </div>
+      </div>
+    {% endfor %}
+   
+  </div>
+</div>
+
+{% endblock %}
+{% block js %}
+
+<script>
+  console.log('working');
+  if(localStorage.getItem('cart') == null){
+  var cart = {};
+  }
+  else
+  {
+  cart = JSON.parse(localStorage.getItem('cart'));
+  document.getElementById('cart').innerHTML = Object.keys(cart).length;
+  updateCart(cart);
+  }
+  $('.cart').click(function(){
+ 
+  var idstr = this.id.toString();
+  
+  if (cart[idstr] !=undefined){
+  cart[idstr] = cart[idstr] + 1;
+  }
+  else
+  {
+  cart[idstr] = 1;
+  }
+  updateCart(cart);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  document.getElementById('cart').innerHTML = Object.keys(cart).length;
+  });
+  $(document).ready(function(){
+    $('[data-toggle="popover"]').popover();   
+  });
+
+  function updateCart(cart){
+    console.log(cart)
+    for(var item in cart){
+      document.getElementById('div'+item).innerHTML="<button id='minus"+item+"'class='btn btn-primary minus'>-</button><span id='val"+item+"'>"+cart[item]+"</span><button id='plus"+item+"'class='btn btn-primary plus'>+</button>";
+    }
+  }
+</script>
+{% endblock %}
