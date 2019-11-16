@@ -2,6 +2,7 @@
 {% load static %}
 {% block body %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script>
         $(document).ready(function(){
             $flag=1;
@@ -103,13 +104,11 @@
             
         });
 </script>
-<style>
-     
+<style>     
 </style>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <!------ Include the above in your HEAD tag ---------->
-
 
 <body style="margin-top: 180px">
 <div class="row">
@@ -208,14 +207,16 @@
                             <div class="help-block with-errors"></div>
                             <span id="Massage" class="text-danger"></span>
                     </div>
-                    <center><button type="submit" id="submit" class="btn btn-warning" >
+                    <hr>
+                    <div class="form-group">
+                        <div class="g-recaptcha" style="margin-left: 150px;" data-sitekey="6LcwCsMUAAAAADB9eHqQFxaoVSHBJvb7sVe-T7lh"></div><br>
+                        <center><button type="submit" id="submit" class="btn btn-warning" >
                             SUBMIT &nbsp&nbsp&nbsp<span class="glyphicon glyphicon-send"></span></button>
                             &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp  <button type="reset" id="reset" class="btn btn-warning" >
                             Cancel &nbsp&nbsp&nbsp<span class="glyphicon glyphicon-remove"></span></button>    
                     </center>
-                   
+                    </div>       
 				</form>
-
 			</div>
 		</div>
 	</div>

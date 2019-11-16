@@ -29,7 +29,7 @@ class Uregiser(models.Model):
     city     = models.CharField(max_length=50)
     area     = models.CharField(max_length=50)
     contect  = models.CharField(max_length=13)
-    pincode  = models.IntegerField(default=0)
+    pincode  = models.IntegerField(max_length=6,default=0)
     email    = models.CharField(max_length=30,unique = True)
     password = models.CharField(max_length=15)
     def __str__(self):

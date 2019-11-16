@@ -13,6 +13,8 @@ from .models import *
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import os
+import json
+import requests
 from .utils import *
 from django.views.generic import View
 from django.template.loader import get_template
@@ -224,41 +226,52 @@ def regu(request):
         address = request.POST.get('address','')
         email = request.POST.get('email','')
         Password = request.POST.get('Password','')
-        if Uregiser.objects.filter(email = email).exists():            
-            if eregiser.objects.filter(contect = phone).exists():
-                messages.warning(request,f'Your Email and Phone Number Alrady Exists! Please Try Using Another')
-            else:
-                messages.error(request,f'Your Email Alrady Exists! Please Try Using Another')
-            return render(request,'regu.html')
+        #recaptcha .....................................
+        clientkey=request.POST['g-recaptcha-response']
+        secretkey='6LcwCsMUAAAAAMzinhsp2Ak3Zyr9GIlv1-ssUr2S'
+        captchadata={
+                'secret':secretkey,
+                'response':clientkey
+        }
+        r=requests.post('https://www.google.com/recaptcha/api/siteverify',data=captchadata)
+        response=json.loads(r.text)
+        verify=response["success"]
+        if verify:
+            if Uregiser.objects.filter(email = email).exists():            
+                if eregiser.objects.filter(contect = phone).exists():
+                    messages.warning(request,f'Your Email and Phone Number Alrady Exists! Please Try Using Another')
+                else:
+                    messages.error(request,f'Your Email Alrady Exists! Please Try Using Another')
+                return render(request,'regu.html')
 
-        elif eregiser.objects.filter(email = email).exists():
-            if eregiser.objects.filter(contect = phone).exists():
-                messages.warning(request,f'Your Email and Phone Number Alrady Exists as a engineer! Please Try Using Another')
-            else:
-               messages.error(request,f'Your Email Alrady Exists in Engineer! Please Try Using Another')
+            elif eregiser.objects.filter(email = email).exists():
+                if eregiser.objects.filter(contect = phone).exists():
+                    messages.warning(request,f'Your Email and Phone Number Alrady Exists as a engineer! Please Try Using Another')
+                else:
+                    messages.error(request,f'Your Email Alrady Exists in Engineer! Please Try Using Another')
+                return render(request,'regu.html')
+            elif head.objects.filter(email = email).exists():
+                messages.error(request,f'This email alrady reserverd for admin! Please Try Using Another')
+                return render(request,'rege.html')
+            elif Uregiser.objects.filter(contect = phone).exists():
+                messages.error(request,f'Your Mobile Number Alrady Registered!')
+                return render(request,'regu.html')
+            elif eregiser.objects.filter(contect = phone).exists():
+                messages.error(request,f'Your Mobile Number Alrady Registered!')
+                return render(request,'regu.html')
+            else:    
+                reg = Uregiser(u_name=name,city=City,area=address,contect=phone,pincode=Pincode,email=email,password=Password)
+                reg.save()
+                messages.success(request,'Account is Created !'+name)
+                subject = 'IT SOLUTION HUB'
+                message = ' Thanks For Registeation '
+                email_from = settings.EMAIL_HOST_USER
+                recipient_list = [email]
+                send_mail( subject, message, email_from, recipient_list )
+                return render(request,'regu.html')
+        else:
+            messages.warning(request,'please verify yourself!')
             return render(request,'regu.html')
-        elif head.objects.filter(email = email).exists():
-            messages.error(request,f'This email alrady reserverd for admin! Please Try Using Another')
-            return render(request,'rege.html')
-        elif Uregiser.objects.filter(contect = phone).exists():
-            messages.error(request,f'Your Mobile Number Alrady Registered!')
-            return render(request,'regu.html')
-        elif eregiser.objects.filter(contect = phone).exists():
-            messages.error(request,f'Your Mobile Number Alrady Registered!')
-            return render(request,'regu.html')
-        else:    
-            reg = Uregiser(u_name=name,city=City,area=address,contect=phone,pincode=Pincode,email=email,password=Password)
-            reg.save()
-            messages.success(request,'Account is Created !'+name)
-            subject = 'IT SOLUTION HUB'
-            message = ' Thanks For Registeation '
-            email_from = settings.EMAIL_HOST_USER
-            recipient_list = [email]
-            send_mail( subject, message, email_from, recipient_list )
-            return render(request,'regu.html')
-    else:
-        #messages.warning(request,f'Somthing Might Be Wrong Please Tray Again Later!')
-        return render(request,'regu.html')
     return render(request,'regu.html')
 
 #view for engineer register
@@ -270,40 +283,54 @@ def rege(request):
         phone = request.POST.get('phone','')
         email = request.POST.get('email','')
         Password = request.POST.get('Password','')
-        if eregiser.objects.filter(email = email).exists():
-            if eregiser.objects.filter(contect = phone).exists():
-                messages.warning(request,f'Your Email and Phone Number Alrady Exists! Please Try Using Another')
-            else:
-                messages.warning(request,f'Your Email Alrady Exists! Please Try Using Another')
-            return render(request,'rege.html')
-        elif Uregiser.objects.filter(email = email).exists():
-            if Uregiser.objects.filter(contect = phone).exists():
-                messages.warning(request,f'Your Email and Phone Number Alrady Exists as a user! Please Try Using Another')
-            else:
-                messages.warning(request,f'Your Email Alrady Exists as a ! Please Try Using Another')
-            return render(request,'rege.html')
-        elif head.objects.filter(email = email).exists():
-            messages.warning(request,f'This email alrady reserverd for admin! Please Try Using Another')
-            return render(request,'rege.html')
-        elif eregiser.objects.filter(contect = phone).exists():
-            messages.warning(request,f'Your Mobile Number Alrady Registered!')
-            return render(request,'rege.html')
-        elif Uregiser.objects.filter(contect = phone).exists():
-            messages.warning(request,f'Your Mobile Number Alrady Registered as a !')
-            return render(request,'rege.html')
-        else:    
-            reg = eregiser(e_name=name,city=City,e_type=etype,contect=phone,email=email,password=Password)
-            reg.save()            
-            messages.success(request,'your account created! Wait For Approval to Login '+name)
-            subject = 'IT SOLUTION HUB'
-            message = ' Thanks For Registeation '
-            email_from = settings.EMAIL_HOST_USER
-            recipient_list = [email]
-            send_mail( subject, message, email_from, recipient_list )
-            return render(request,'rege.html')
+        #recaptcha .....................................
+        clientkey=request.POST['g-recaptcha-response']
+        secretkey='6LcwCsMUAAAAAMzinhsp2Ak3Zyr9GIlv1-ssUr2S'
+        captchadata={
+                'secret':secretkey,
+                'response':clientkey
+        }
+        r=requests.post('https://www.google.com/recaptcha/api/siteverify',data=captchadata)
+        response=json.loads(r.text)
+        verify=response["success"]
+        if verify:
+
+            if eregiser.objects.filter(email = email).exists():
+                if eregiser.objects.filter(contect = phone).exists():
+                    messages.warning(request,f'Your Email and Phone Number Alrady Exists! Please Try Using Another')
+                else:
+                    messages.warning(request,f'Your Email Alrady Exists! Please Try Using Another')
+                    return render(request,'rege.html')
+            elif Uregiser.objects.filter(email = email).exists():
+                if Uregiser.objects.filter(contect = phone).exists():
+                    messages.warning(request,f'Your Email and Phone Number Alrady Exists as a user! Please Try Using Another')
+                else:
+                    messages.warning(request,f'Your Email Alrady Exists as a ! Please Try Using Another')
+                    return render(request,'rege.html')
+            elif head.objects.filter(email = email).exists():
+                messages.warning(request,f'This email alrady reserverd for admin! Please Try Using Another')
+                return render(request,'rege.html')
+            elif eregiser.objects.filter(contect = phone).exists():
+                messages.warning(request,f'Your Mobile Number Alrady Registered!')
+                return render(request,'rege.html')
+            elif Uregiser.objects.filter(contect = phone).exists():
+                messages.warning(request,f'Your Mobile Number Alrady Registered as a !')
+                return render(request,'rege.html')
+            else:    
+                reg = eregiser(e_name=name,city=City,e_type=etype,contect=phone,email=email,password=Password)
+                reg.save()            
+                messages.success(request,'your account created! Wait For Approval to Login '+name)
+                subject = 'IT SOLUTION HUB'
+                message = ' Thanks For Registeation '
+                email_from = settings.EMAIL_HOST_USER
+                recipient_list = [email]
+                send_mail( subject, message, email_from, recipient_list )
+                return render(request,'rege.html')
+        else:
+            messages.warning(request,'please verify yourself!')  
+            return render(request,'rege.html')  
     else:
-        #messages.warning(request,f'Somthing Might Be Wrong Please Tray Again Later!')
-        return render(request,'rege.html')
+        return render(request,'rege.html')  
     return render(request,'rege.html')
 
 #view for login. login for everyone
