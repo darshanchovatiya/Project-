@@ -22,7 +22,7 @@ class editprofile(forms.ModelForm):
                 'u_name':'User Name', 
                 'city':'City', 
                 'area':'Address', 
-                'contect':'Contect', 
+                'contect':'Contact', 
                 'pincode':'Pincode',
                 'password':'Password',
             }
@@ -33,7 +33,7 @@ class engprofile(forms.ModelForm):
         fields=['e_name','contect','e_type','city','password']
         labels  = {
                 'e_name':'Engineer Name', 
-                'contect':'Contect', 
+                'contect':'Contact', 
                 'e_type':'Engineer Type', 
                 'city':'City', 
                 'password':'password'
@@ -44,8 +44,8 @@ class headprofile(forms.ModelForm):
         fields=['a_name','email','contect','password']
         labels  = {
                 'a_name':'Admin Name', 
-                'email':'Admin email',
-                'contect':'Contect Number',  
+                'email':'Admin Email',
+                'contect':'Contact Number',  
                 'password':'Password'
             }
 class VideoForm(forms.ModelForm):
@@ -74,7 +74,7 @@ class compc(forms.ModelForm):
             model = complain
             fields = ['creq']
             labels  = { 
-                'creq':'Your Rquirement(In Peace) ',                 
+                'creq':'Your Requirement(In Peace) ',                 
             }
 
 class compbill(forms.ModelForm):
@@ -101,6 +101,11 @@ class ord(forms.ModelForm):
         class Meta:
             model = order
             fields = ['address','pincode','landmark']
+            labels={
+                'address':'Address',
+                'pincode':'Pincode',
+                'landmark':'Landmark'
+            }
            
 class ser(forms.ModelForm):
         class Meta:

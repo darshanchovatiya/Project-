@@ -336,35 +336,49 @@ def rege(request):
 #view for login. login for everyone
 def login(request):
     if request.method == 'POST':
-        if eregiser.objects.filter(email=request.POST['email'],password=request.POST['Password']).exists():
-            loge = eregiser.objects.get(email=request.POST['email'],password=request.POST['Password'])
-            if loge.status == 0:
-                messages.warning(request,'Your approval is panding')
-                return render(request,'login.html',{'dae':loge})
+        #recaptcha .....................................
+        clientkey=request.POST['g-recaptcha-response']
+        secretkey='6LcwCsMUAAAAAMzinhsp2Ak3Zyr9GIlv1-ssUr2S'
+        captchadata={
+                'secret':secretkey,
+                'response':clientkey
+        }
+        r=requests.post('https://www.google.com/recaptcha/api/siteverify',data=captchadata)
+        response=json.loads(r.text)
+        verify=response["success"]
+        if verify:
+            if eregiser.objects.filter(email=request.POST['email'],password=request.POST['Password']).exists():
+                loge = eregiser.objects.get(email=request.POST['email'],password=request.POST['Password'])
+                if loge.status == 0:
+                    messages.warning(request,'Your approval is panding')
+                    return render(request,'login.html',{'dae':loge})
+                else:
+                    request.session["lgne"] ='Welcome' + loge.e_name    
+                    request.session["prof"] = loge.email 
+                    request.session["type"] = loge.e_type
+                    request.session["acc"] = loge.e_name 
+                    request.session["eid"] = loge.e_id   
+                    return render(request,'index.html',{'dae':loge})
+            elif Uregiser.objects.filter(email=request.POST['email'],password=request.POST['Password']).exists():
+                loge = Uregiser.objects.get(email=request.POST['email'],password=request.POST['Password'])
+                request.session["lgnu"] ='Welcome' + loge.u_name    
+                request.session["prof"] = loge.email  
+                request.session["nm"] = loge.u_id 
+                request.session["unm"] = loge.u_name  
+                return render(request,'index.html',{'dae':loge}) 
+            elif head.objects.filter(email=request.POST['email'],password=request.POST['Password']).exists():
+                loge = head.objects.get(email=request.POST['email'],password=request.POST['Password'])
+                request.session["lgna"] ='Welcome' + loge.a_name 
+                request.session["prof"] = loge.email   
+                request.session["cont"] = loge.email    
+                request.session['contt'] = loge.contect       
+                return render(request,'index.html',{'dae':loge}) 
             else:
-                request.session["lgne"] ='Welcome' + loge.e_name    
-                request.session["prof"] = loge.email 
-                request.session["type"] = loge.e_type
-                request.session["acc"] = loge.e_name 
-                request.session["eid"] = loge.e_id   
-                return render(request,'index.html',{'dae':loge})
-        elif Uregiser.objects.filter(email=request.POST['email'],password=request.POST['Password']).exists():
-            loge = Uregiser.objects.get(email=request.POST['email'],password=request.POST['Password'])
-            request.session["lgnu"] ='Welcome' + loge.u_name    
-            request.session["prof"] = loge.email  
-            request.session["nm"] = loge.u_id 
-            request.session["unm"] = loge.u_name  
-            return render(request,'index.html',{'dae':loge}) 
-        elif head.objects.filter(email=request.POST['email'],password=request.POST['Password']).exists():
-            loge = head.objects.get(email=request.POST['email'],password=request.POST['Password'])
-            request.session["lgna"] ='Welcome' + loge.a_name 
-            request.session["prof"] = loge.email   
-            request.session["cont"] = loge.email    
-            request.session['contt'] = loge.contect       
-            return render(request,'index.html',{'dae':loge}) 
+                request.session.modified = True
+                messages.warning(request,'Invalid Username Or Password')
+                return render(request,'login.html')
         else:
-            request.session.modified = True
-            messages.warning(request,'Invalid Username Or Password')
+            messages.warning(request,'please verify yourself!')
             return render(request,'login.html')
     return render(request,'login.html')
 
