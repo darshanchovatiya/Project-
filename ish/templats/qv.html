@@ -29,11 +29,11 @@
           <p><strong>{{i.p_name}}</strong></p>
           <p><b>Price:{{i.price}}</b></p>
           {% if i.rating >= 4.5  %}
-            <p style="color: red">Rating:{{i.rating}}<i class="fas fa-star" aria-hidden="true"></i></p> 
+            <p style="color: red">Rating:{{i.rating|floatformat:1}}<i class="fas fa-star" aria-hidden="true"></i></p> 
           {% elif i.rating < 4.5 and i.rating >= 3 %}
-            <p style="color: rgb(247, 114, 6)">Rating:{{i.rating}}<i class="fas fa-star" aria-hidden="true"></i></p> 
+            <p style="color: rgb(247, 114, 6)">Rating:{{i.rating|floatformat:1}}<i class="fas fa-star" aria-hidden="true"></i></p> 
           {% elif i.rating < 3 %}
-            <p style="color: rgb(121, 118, 118)">Rating:{{i.rating}}<i class="fas fa-star" aria-hidden="true"></i></p> 
+            <p style="color: rgb(121, 118, 118)">Rating:{{i.rating|floatformat:1}}<i class="fas fa-star" aria-hidden="true"></i></p> 
           {% endif %} 
           {% if i.stock <= 5 %}  
             <p style="color: red"><strong>Hurry Only In Stock:{{i.stock}}</strong></p>
